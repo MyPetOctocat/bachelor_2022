@@ -1,0 +1,128 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.4.4)  4 APR 2022 15:28
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**./test.tex
+(test.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-02-24>
+(C:\Users\Sebastian\AppData\Local\Programs\MiKTeX\tex/latex/base\book.cls
+Document Class: book 2021/10/04 v1.4n Standard LaTeX document class
+(C:\Users\Sebastian\AppData\Local\Programs\MiKTeX\tex/latex/base\bk12.clo
+File: bk12.clo 2021/10/04 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count185
+\c@chapter=\count186
+\c@section=\count187
+\c@subsection=\count188
+\c@subsubsection=\count189
+\c@paragraph=\count190
+\c@subparagraph=\count191
+\c@figure=\count192
+\c@table=\count193
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen138
+)
+(C:\Users\Sebastian\AppData\Local\Programs\MiKTeX\tex/generic/babel\babel.sty
+Package: babel 2022/02/26 3.73 The Babel package
+\babel@savecnt=\count194
+\U@D=\dimen139
+\l@unhyphenated=\language79
+
+(C:\Users\Sebastian\AppData\Local\Programs\MiKTeX\tex/generic/babel\txtbabel.de
+f)
+\bbl@readstream=\read2
+\bbl@dirlevel=\count195
+
+*************************************
+* Local config file bblopts.cfg used
+*
+(C:\Users\Sebastian\AppData\Local\Programs\MiKTeX\tex/latex/arabi\bblopts.cfg
+File: bblopts.cfg 2005/09/08 v0.1 add Arabic and Farsi to "declared" options of
+ babel
+)
+(C:\Users\Sebastian\AppData\Local\Programs\MiKTeX\tex/latex/babel-english\engli
+sh.ldf
+Language: english 2017/06/06 v3.3r English support from the babel system
+Package babel Info: Hyphen rules for 'canadian' set to \l@english
+(babel)             (\language0). Reported on input line 102.
+Package babel Info: Hyphen rules for 'australian' set to \l@ukenglish
+(babel)             (\language73). Reported on input line 105.
+Package babel Info: Hyphen rules for 'newzealand' set to \l@ukenglish
+(babel)             (\language73). Reported on input line 108.
+))
+(C:\Users\Sebastian\AppData\Local\Programs\MiKTeX\tex/latex/blindtext\blindtext
+.sty
+Package: blindtext 2012/01/06 V2.0 blindtext-Package
+
+(C:\Users\Sebastian\AppData\Local\Programs\MiKTeX\tex/latex/tools\xspace.sty
+Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
+)
+\c@blindtext=\count196
+\c@Blindtext=\count197
+\c@blind@countparstart=\count198
+\blind@countxx=\count199
+\blindtext@numBlindtext=\count266
+\blind@countyy=\count267
+\c@blindlist=\count268
+\c@blindlistlevel=\count269
+\c@blindlist@level=\count270
+\blind@listitem=\count271
+\c@blind@listcount=\count272
+\c@blind@levelcount=\count273
+\blind@mathformula=\count274
+\blind@Mathformula=\count275
+\c@blind@randomcount=\count276
+\c@blind@randommax=\count277
+\c@blind@pangramcount=\count278
+\c@blind@pangrammax=\count279
+)
+(C:\Users\Sebastian\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend
+-pdftex.def
+File: l3backend-pdftex.def 2022-02-07 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count280
+\l__pdf_internal_box=\box50
+) (test.aux)
+\openout1 = `test.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <14.4> on input line 11.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 11.
+ [1
+
+
+{C:/Users/Sebastian/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}] [2] (tes
+t.aux) ) 
+Here is how much of TeX's memory you used:
+ 1594 strings out of 478582
+ 28753 string characters out of 2842457
+ 346388 words of memory out of 3000000
+ 19831 multiletter control sequences out of 15000+600000
+ 472349 words of font info for 38 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 40i,6n,52p,162b,185s stack positions out of 10000i,1000n,20000p,200000b,80000s
+<C:/Users/Sebastian/AppData/Local/Programs/MiKTeX/fonts/type1/public/am
+sfonts/cm/cmss12.pfb><C:/Users/Sebastian/AppData/Local/Programs/MiKTeX/fonts/ty
+pe1/public/amsfonts/cm/cmssbx10.pfb>
+Output written on test.pdf (2 pages, 27356 bytes).
+PDF statistics:
+ 19 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+

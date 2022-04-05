@@ -1,0 +1,3 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{\numberline {1}Problem}{3}{}%
+\contentsline {chapter}{\numberline {2}Goal}{4}{}%

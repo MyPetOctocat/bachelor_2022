@@ -11,8 +11,8 @@ from tensorflow_transform.tf_metadata import schema_utils
 from tfx import v1 as tfx
 from tfx_bsl.public import tfxio
 
-_FEATURE_KEYS = ['userId', 'movieId']
-_LABEL_KEY = 'rating'
+_FEATURE_KEYS = ["movie_id","user_id","user_gender"]
+_LABEL_KEY = 'user_rating'
 
 _FEATURE_SPEC = {
     **{
@@ -30,25 +30,38 @@ class RankingModel(tf.keras.Model):
 
     unique_user_ids = np.array(range(943)).astype(str)
     unique_movie_ids = np.array(range(1682)).astype(str)
+    unique_gender_ids = np.array(range(2)).astype(str)
+
 
     # Compute embeddings for users.
     self.user_embeddings = tf.keras.Sequential([
-        tf.keras.layers.Input(shape=(1,), name='userId', dtype=tf.int64),
+        tf.keras.layers.Input(shape=(1,), name='user_id', dtype=tf.int64),
         tf.keras.layers.Lambda(lambda x: tf.as_string(x)),
         tf.keras.layers.StringLookup(
             vocabulary=unique_user_ids, mask_token=None),
+        # Input of 943 dims -->  Embedding of 32 dims
         tf.keras.layers.Embedding(
             len(unique_user_ids) + 1, embedding_dimension)
     ])
 
     # Compute embeddings for movies.
     self.movie_embeddings = tf.keras.Sequential([
-        tf.keras.layers.Input(shape=(1,), name='movieId', dtype=tf.int64),
+        tf.keras.layers.Input(shape=(1,), name='movie_id', dtype=tf.int64),
         tf.keras.layers.Lambda(lambda x: tf.as_string(x)),
         tf.keras.layers.StringLookup(
             vocabulary=unique_movie_ids, mask_token=None),
         tf.keras.layers.Embedding(
             len(unique_movie_ids) + 1, embedding_dimension)
+    ])
+
+    # Compute embeddings for movies.
+    self.gender_embeddings = tf.keras.Sequential([
+        tf.keras.layers.Input(shape=(1,), name='user_gender', dtype=tf.int64),
+        tf.keras.layers.Lambda(lambda x: tf.as_string(x)),
+        tf.keras.layers.StringLookup(
+            vocabulary=unique_gender_ids, mask_token=None),
+        tf.keras.layers.Embedding(
+            len(unique_gender_ids) + 1, embedding_dimension)
     ])
 
     # Compute predictions.
@@ -60,12 +73,13 @@ class RankingModel(tf.keras.Model):
 
   def call(self, inputs):
 
-    user_id, movie_id = inputs
+    user_id, movie_id, user_gender = inputs
 
     user_embedding = self.user_embeddings(user_id)
     movie_embedding = self.movie_embeddings(movie_id)
+    gender_embedding = self.gender_embeddings(user_gender)
 
-    return self.ratings(tf.concat([user_embedding, movie_embedding], axis=2))
+    return self.ratings(tf.concat([user_embedding, movie_embedding, gender_embedding], axis=2))
 
 
 class MovielensModel(tfrs.models.Model):
@@ -78,7 +92,7 @@ class MovielensModel(tfrs.models.Model):
         metrics=[tf.keras.metrics.RootMeanSquaredError()])
 
   def call(self, features: Dict[str, tf.Tensor]) -> tf.Tensor:
-    return self.ranking_model((features['userId'], features['movieId']))
+    return self.ranking_model((features['user_id'], features['movie_id'], features['user_gender']))
 
   def compute_loss(self,
                    features: Dict[Text, tf.Tensor],
@@ -113,6 +127,10 @@ def run_fn(fn_args: tfx.components.FnArgs):
   Args:
     fn_args: Holds args used to train the model as name/value pairs.
   """
+  from datetime import datetime
+  logdir = "pipeline/pipelines/TFRS-iterate/logs/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+  tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
+
   schema = schema_utils.schema_from_feature_spec(_FEATURE_SPEC)
 
   train_dataset = _input_fn(
@@ -129,6 +147,7 @@ def run_fn(fn_args: tfx.components.FnArgs):
       steps_per_epoch=fn_args.train_steps,
       epochs = 3,
       validation_data=eval_dataset,
-      validation_steps=fn_args.eval_steps)
+      validation_steps=fn_args.eval_steps,
+      callbacks=[tensorboard_callback])
 
   model.save(fn_args.serving_model_dir)

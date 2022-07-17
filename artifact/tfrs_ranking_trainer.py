@@ -54,11 +54,11 @@ class RankingModel(tf.keras.Model):
             len(unique_movie_ids) + 1, embedding_dimension)
     ])
 
-    # Compute embeddings for movies.
+    # Compute embeddings for gender.
     self.gender_embeddings = tf.keras.Sequential([
         tf.keras.layers.Input(shape=(1,), name='user_gender', dtype=tf.int64),
-        tf.keras.layers.Lambda(lambda x: tf.as_string(x)),
-        tf.keras.layers.StringLookup(
+        #tf.keras.layers.Lambda(lambda x: tf.as_int(x)),
+        tf.keras.layers.IntegerLookup(
             vocabulary=unique_gender_ids, mask_token=None),
         tf.keras.layers.Embedding(
             len(unique_gender_ids) + 1, embedding_dimension)

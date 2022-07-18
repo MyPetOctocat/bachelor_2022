@@ -90,8 +90,8 @@ class RankingModel(tf.keras.Model):
 
     # Compute predictions.
     self.ratings = tf.keras.Sequential([
-        tfrs.layers.dcn.Cross(
-          kernel_initializer="glorot_uniform"),
+        tfrs.layers.dcn.Cross(),
+        tfrs.layers.dcn.Cross(),
         tf.keras.layers.Dense(256, activation='relu'),
         tf.keras.layers.Dense(64, activation='relu'),
         tf.keras.layers.Dense(1)
@@ -158,7 +158,7 @@ def run_fn(fn_args: tfx.components.FnArgs):
     fn_args: Holds args used to train the model as name/value pairs.
   """
   from datetime import datetime
-  logdir = "pipeline/pipelines/TFRS-iterate/logs/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+  logdir = "pipeline/pipelines/DCN-iterate/logs/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
   tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
 
   schema = schema_utils.schema_from_feature_spec(_FEATURE_SPEC)

@@ -58,7 +58,7 @@ class RankingModel(tf.keras.Model):
     ])
 
     # Compute embeddings for occupations.
-    self.movie_embeddings = tf.keras.Sequential([
+    self.occupation_embeddings = tf.keras.Sequential([
         tf.keras.layers.Input(shape=(1,), name='user_occupation', dtype=tf.int64),
         tf.keras.layers.Lambda(lambda x: tf.as_string(x)),
         tf.keras.layers.StringLookup(
@@ -91,7 +91,7 @@ class RankingModel(tf.keras.Model):
     user_embedding = self.user_embeddings(user_id)
     movie_embedding = self.movie_embeddings(movie_id)
     gender_embedding = self.gender_embeddings(user_gender)
-    occupation_embedding = self.gender_embeddings(user_occupation)
+    occupation_embedding = self.occupation_embeddings(user_occupation)
 
 
     return self.ratings(tf.concat([user_embedding, movie_embedding, gender_embedding, occupation_embedding], axis=2))

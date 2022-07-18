@@ -11,7 +11,7 @@ from tensorflow_transform.tf_metadata import schema_utils
 from tfx import v1 as tfx
 from tfx_bsl.public import tfxio
 
-_FEATURE_KEYS = ["movie_id","user_id","user_gender"]
+_FEATURE_KEYS = ["movie_id","user_id","user_gender", "user_occupation"]
 _LABEL_KEY = 'user_rating'
 
 _FEATURE_SPEC = {
@@ -21,15 +21,18 @@ _FEATURE_SPEC = {
     }, _LABEL_KEY: tf.io.FixedLenFeature(shape=[1], dtype=tf.int64)
 }
 
-
 class RankingModel(tf.keras.Model):
 
   def __init__(self):
     super().__init__()
+
+    # Define the dimension the features should be embedded in (Dim of vector representation of each feature)
     embedding_dimension = 32
 
+    # Create np array with incrementing values as the vocabulary
     unique_user_ids = np.array(range(943)).astype(str)
     unique_movie_ids = np.array(range(1682)).astype(str)
+    unique_occupation_ids = np.array(range(21)).astype(str)
     unique_gender_ids = np.array(range(2)).astype(str)
 
 
@@ -54,6 +57,16 @@ class RankingModel(tf.keras.Model):
             len(unique_movie_ids) + 1, embedding_dimension)
     ])
 
+    # Compute embeddings for occupations.
+    self.movie_embeddings = tf.keras.Sequential([
+        tf.keras.layers.Input(shape=(1,), name='user_occupation', dtype=tf.int64),
+        tf.keras.layers.Lambda(lambda x: tf.as_string(x)),
+        tf.keras.layers.StringLookup(
+            vocabulary=unique_occupation_ids, mask_token=None),
+        tf.keras.layers.Embedding(
+            len(unique_occupation_ids) + 1, embedding_dimension)
+    ])
+
     # Compute embeddings for gender.
     self.gender_embeddings = tf.keras.Sequential([
         tf.keras.layers.Input(shape=(1,), name='user_gender', dtype=tf.int64),
@@ -73,13 +86,15 @@ class RankingModel(tf.keras.Model):
 
   def call(self, inputs):
 
-    user_id, movie_id, user_gender = inputs
+    user_id, movie_id, user_gender, user_occupation = inputs
 
     user_embedding = self.user_embeddings(user_id)
     movie_embedding = self.movie_embeddings(movie_id)
     gender_embedding = self.gender_embeddings(user_gender)
+    occupation_embedding = self.gender_embeddings(user_occupation)
 
-    return self.ratings(tf.concat([user_embedding, movie_embedding, gender_embedding], axis=2))
+
+    return self.ratings(tf.concat([user_embedding, movie_embedding, gender_embedding, occupation_embedding], axis=2))
 
 
 class MovielensModel(tfrs.models.Model):
@@ -92,7 +107,7 @@ class MovielensModel(tfrs.models.Model):
         metrics=[tf.keras.metrics.RootMeanSquaredError()])
 
   def call(self, features: Dict[str, tf.Tensor]) -> tf.Tensor:
-    return self.ranking_model((features['user_id'], features['movie_id'], features['user_gender']))
+    return self.ranking_model((features['user_id'], features['movie_id'], features['user_gender'], features['user_occupation']))
 
   def compute_loss(self,
                    features: Dict[Text, tf.Tensor],

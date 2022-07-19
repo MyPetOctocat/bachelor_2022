@@ -93,14 +93,14 @@ class RankingModel(tf.keras.Model):
     ])
 
     # Cross Layer
-    self.cross_layer = tfrs.layers.dcn.Cross()
+    self.cross_layer = tfrs.layers.dcn.Cross(kernel_initializer=tf.keras.initializers.RandomNormal(seed=1)) # Use seeds to make model reproducible
 
     # Compute predictions.
     self.ratings = tf.keras.Sequential([
         self.cross_layer,
-        tf.keras.layers.Dense(256, activation='relu'),
-        tf.keras.layers.Dense(64, activation='relu'),
-        tf.keras.layers.Dense(1)
+        tf.keras.layers.Dense(256, activation='relu', kernel_initializer=tf.keras.initializers.RandomNormal(seed=1)),
+        tf.keras.layers.Dense(64, activation='relu', kernel_initializer=tf.keras.initializers.RandomNormal(seed=1)),
+        tf.keras.layers.Dense(1, kernel_initializer=tf.keras.initializers.RandomNormal(seed=1))
     ])
 
   def call(self, inputs):
@@ -193,15 +193,17 @@ def run_fn(fn_args: tfx.components.FnArgs):
   model.save(fn_args.serving_model_dir)
 
 
-  ###  Display model summary & save plot of model architecture
+  ###  Display model summary
   print("\n#####################################")
   print(model.summary())
   print()
+
+  # Save plot of model architecture
   model_num = fn_args.serving_model_dir.split("/")[-2]   # extract model number
   img_dir = fn_args.custom_config["plot_path"] + f"/{model_num}"
   print(img_dir)
   Path(img_dir).mkdir(parents=True, exist_ok=True)
-  tf.keras.utils.plot_model(model, to_file=f"{img_dir}/model_architecture_{model_num}.png", show_shapes=True)
+  tf.keras.utils.plot_model(model.ranking_model.ratings, to_file=f"{img_dir}/model_architecture_{model_num}.png", show_shapes=True)
   print()
 
   ### Cross feature Visualization
@@ -211,12 +213,13 @@ def run_fn(fn_args: tfx.components.FnArgs):
   block_norm = np.ones([len(features), len(features)])
   dim = model.ranking_model.embedding_dims
 
-  # Compute the norms of the blocks. (revert 32 dimensional feature embedding to 1D)
+  # Compute the norms of the blocks.
   for i in range(len(features)):
     for j in range(len(features)):
-      block = mat[i * dim:(i + 1) * dim,
+      # Norm of 32x32 Matrix is calculated | 32x32 values --> 1 value
+      block = mat[i * dim:(i + 1) * dim,    # 32x32 blocks are retrieved from cross network
                   j * dim:(j + 1) * dim]
-      block_norm[i,j] = np.linalg.norm(block, ord="fro")
+      block_norm[i,j] = np.linalg.norm(block, ord="fro") # Frobenius norm is used | norm of each matrix element is calculated and added together
   # Create plot
   plt.figure(figsize=(9,9))
   im = plt.matshow(block_norm, cmap=plt.cm.Blues)

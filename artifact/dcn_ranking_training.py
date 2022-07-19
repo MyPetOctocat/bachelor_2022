@@ -3,6 +3,9 @@ from typing import Dict, Text
 from typing import List
 from pathlib import Path
 
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 import numpy as np
 import tensorflow as tf
 
@@ -29,7 +32,7 @@ class RankingModel(tf.keras.Model):
 
     # Define the dimension the features should be embedded in (Dim of vector representation of each feature)
     embedding_dimension = 32
-
+    self.embedding_dims = embedding_dimension
     # Create np array with incrementing values as the vocabulary
     unique_user_ids = np.array(range(943)).astype(str)
     unique_movie_ids = np.array(range(1682)).astype(str)
@@ -89,10 +92,12 @@ class RankingModel(tf.keras.Model):
             len(unique_age_ids) + 1, embedding_dimension)
     ])
 
+    # Cross Layer
+    self.cross_layer = tfrs.layers.dcn.Cross()
+
     # Compute predictions.
     self.ratings = tf.keras.Sequential([
-        tfrs.layers.dcn.Cross(),
-        tfrs.layers.dcn.Cross(),
+        self.cross_layer,
         tf.keras.layers.Dense(256, activation='relu'),
         tf.keras.layers.Dense(64, activation='relu'),
         tf.keras.layers.Dense(1)
@@ -102,6 +107,7 @@ class RankingModel(tf.keras.Model):
 
     user_id, movie_id, user_gender, user_occupation, user_age = inputs
 
+    # Calculate embedding for each feature and save in *_embedding variable
     user_embedding = self.user_embeddings(user_id)
     movie_embedding = self.movie_embeddings(movie_id)
     gender_embedding = self.gender_embeddings(user_gender)
@@ -109,7 +115,7 @@ class RankingModel(tf.keras.Model):
     age_embedding = self.age_embeddings(user_age)
 
 
-
+    # Create embedding layer
     return self.ratings(tf.concat([user_embedding, movie_embedding, gender_embedding, occupation_embedding, age_embedding], axis=2))
 
 
@@ -191,8 +197,38 @@ def run_fn(fn_args: tfx.components.FnArgs):
   print("######################")
   print(model.summary())
   print()
+  # extract model number
   model_num = fn_args.serving_model_dir.split("/")[-2]
   img_dir = fn_args.custom_config["plot_path"] + f"/{model_num}"
   print(img_dir)
   Path(img_dir).mkdir(parents=True, exist_ok=True)
-  tf.keras.utils.plot_model(model, to_file=f"{img_dir}/model_architecture.png", show_shapes=True)
+  tf.keras.utils.plot_model(model, to_file=f"{img_dir}/model_architecture_{model_num}.png", show_shapes=True)
+  print()
+
+  ### Cross feature Visualization
+
+  mat = model.ranking_model.cross_layer._dense.kernel # Cross weights matrix
+  features = _FEATURE_KEYS
+
+  block_norm = np.ones([len(features), len(features)])
+  dim = model.ranking_model.embedding_dims
+  print(dim)
+
+  # Compute the norms of the blocks. (revert 32 dimensional feature embedding to 1D)
+  for i in range(len(features)):
+    for j in range(len(features)):
+      block = mat[i * dim:(i + 1) * dim,
+                  j * dim:(j + 1) * dim]
+      block_norm[i,j] = np.linalg.norm(block, ord="fro")
+  # Create plot
+  plt.figure(figsize=(9,9))
+  im = plt.matshow(block_norm, cmap=plt.cm.Blues)
+  ax = plt.gca()
+  divider = make_axes_locatable(plt.gca())
+  cax = divider.append_axes("right", size="5%", pad=0.05)
+  plt.colorbar(im, cax=cax)
+  cax.tick_params(labelsize=10)
+  _ = ax.set_xticklabels([""] + features, rotation=45, ha="left", fontsize=10)
+  _ = ax.set_yticklabels([""] + features, fontsize=10)
+  
+  plt.savefig(f"{img_dir}/cross_features_{model_num}", dpi=500, bbox_inches='tight')

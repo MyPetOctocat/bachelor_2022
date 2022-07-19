@@ -1,6 +1,7 @@
 
 from typing import Dict, Text
 from typing import List
+from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
@@ -157,10 +158,13 @@ def run_fn(fn_args: tfx.components.FnArgs):
   Args:
     fn_args: Holds args used to train the model as name/value pairs.
   """
+
+  # Generate training logfiles for tensorboard
   from datetime import datetime
   logdir = "pipeline/pipelines/DCN-iterate/logs/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
   tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
 
+  # Derive data schema from generated _FEATURE_SPEC dictionary
   schema = schema_utils.schema_from_feature_spec(_FEATURE_SPEC)
 
   train_dataset = _input_fn(
@@ -181,3 +185,14 @@ def run_fn(fn_args: tfx.components.FnArgs):
       callbacks=[tensorboard_callback])
 
   model.save(fn_args.serving_model_dir)
+
+
+ #  Display model summary & save plot of model architecture
+  print("######################")
+  print(model.summary())
+  print()
+  model_num = fn_args.serving_model_dir.split("/")[-2]
+  img_dir = fn_args.custom_config["plot_path"] + f"/{model_num}"
+  print(img_dir)
+  Path(img_dir).mkdir(parents=True, exist_ok=True)
+  tf.keras.utils.plot_model(model, to_file=f"{img_dir}/model_architecture.png", show_shapes=True)

@@ -193,12 +193,11 @@ def run_fn(fn_args: tfx.components.FnArgs):
   model.save(fn_args.serving_model_dir)
 
 
- #  Display model summary & save plot of model architecture
-  print("######################")
+  ###  Display model summary & save plot of model architecture
+  print("\n#####################################")
   print(model.summary())
   print()
-  # extract model number
-  model_num = fn_args.serving_model_dir.split("/")[-2]
+  model_num = fn_args.serving_model_dir.split("/")[-2]   # extract model number
   img_dir = fn_args.custom_config["plot_path"] + f"/{model_num}"
   print(img_dir)
   Path(img_dir).mkdir(parents=True, exist_ok=True)
@@ -206,13 +205,11 @@ def run_fn(fn_args: tfx.components.FnArgs):
   print()
 
   ### Cross feature Visualization
-
   mat = model.ranking_model.cross_layer._dense.kernel # Cross weights matrix
   features = _FEATURE_KEYS
 
   block_norm = np.ones([len(features), len(features)])
   dim = model.ranking_model.embedding_dims
-  print(dim)
 
   # Compute the norms of the blocks. (revert 32 dimensional feature embedding to 1D)
   for i in range(len(features)):
@@ -230,5 +227,5 @@ def run_fn(fn_args: tfx.components.FnArgs):
   cax.tick_params(labelsize=10)
   _ = ax.set_xticklabels([""] + features, rotation=45, ha="left", fontsize=10)
   _ = ax.set_yticklabels([""] + features, fontsize=10)
-  
+
   plt.savefig(f"{img_dir}/cross_features_{model_num}", dpi=500, bbox_inches='tight')

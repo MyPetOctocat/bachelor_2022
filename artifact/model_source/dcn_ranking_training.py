@@ -185,7 +185,7 @@ def run_fn(fn_args: tfx.components.FnArgs):
   model.fit(
       train_dataset,
       steps_per_epoch=fn_args.train_steps,
-      epochs = 3,
+      epochs = 1,
       validation_data=eval_dataset,
       validation_steps=fn_args.eval_steps,
       callbacks=[tensorboard_callback])

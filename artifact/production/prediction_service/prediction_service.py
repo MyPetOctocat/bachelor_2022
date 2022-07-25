@@ -6,10 +6,11 @@ from batch_predictor import predict_batch
 
 # Set working directory
 os.chdir('../..')
+print(os.getcwd())
 
 # Declare path variables
 
-production_data = 'ml-100_prod'
+production_data = 'ml-1k_prod'
 prediction_data_dir = f'production/production_data/{production_data}.csv'
 PIPELINE_NAME = 'DCN-iterate'
 PIPE_DIR = 'pipeline'

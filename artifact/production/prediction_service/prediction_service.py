@@ -5,7 +5,7 @@ import tensorflow as tf
 from batch_predictor import predict_batch
 
 # Set working directory
-os.chdir('..')
+os.chdir('../..')
 
 # Declare path variables
 

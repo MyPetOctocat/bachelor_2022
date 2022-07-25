@@ -3,7 +3,10 @@ from time import time
 from rmse_calculator import rmse_calc
 from cd_detector import cd_detector
 from rmse_plot_generator import plot_gen as rpg
+import os
 
+os.chdir("..")
+print(os.getcwd())
 
 df = pd.read_csv('DCN-iterate_1658684509_predictions.csv')  # Load prediction score dataset
 
@@ -23,10 +26,10 @@ no_cd = cd_detector(rmse_df, delta_threshold=0.1, absolute_threshold=1.5)
 
 # Write file of the CD evaluation result (prerequisite to CD adaptation: File can be read by Airflow an initiate TFX retraining)
 if no_cd:
-    with open('OK.txt', 'w') as file:
+    with open('evaluation_outputs/OK.txt', 'w') as file:
         file.write(str(time()))
 else:
-    with open('CD_DETECTED.txt', 'w') as file:
+    with open('evaluation_outputs/CD_DETECTED.txt', 'w') as file:
         file.write(str(time()))
 
 
@@ -37,6 +40,6 @@ vis_rmse_float = rmse_calc(df[['date', 'user_rating', 'pred_rating']], group_by)
 vis_rmse_int = rmse_calc(df[['date', 'user_rating', 'pred_int_rating']], group_by)  # RMSE of rounded predictions
 vis_rmse_df = pd.DataFrame(dict(rmse_float=vis_rmse_float, rmse_int=vis_rmse_int))
 
-rpg(vis_rmse_df, "rmse_trend.png")
+rpg(vis_rmse_df, "evaluation_outputs/rmse_trend.png")
 
 

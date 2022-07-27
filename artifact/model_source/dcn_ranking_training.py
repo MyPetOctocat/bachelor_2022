@@ -30,7 +30,7 @@ class RankingModel(tf.keras.Model):
   def __init__(self):
     super().__init__()
 
-    # Define the dimension the feature values should be embedded in (Dim of vector representation of each feature)
+    # Define the dimension the feature values should be embedded in
     embedding_dimension = 32
     self.embedding_dims = embedding_dimension
     # Create np array with incrementing values as the vocabulary

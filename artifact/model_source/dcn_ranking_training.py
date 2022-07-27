@@ -30,7 +30,7 @@ class RankingModel(tf.keras.Model):
   def __init__(self):
     super().__init__()
 
-    # Define the dimension the features should be embedded in (Dim of vector representation of each feature)
+    # Define the dimension the feature values should be embedded in (Dim of vector representation of each feature)
     embedding_dimension = 32
     self.embedding_dims = embedding_dimension
     # Create np array with incrementing values as the vocabulary
@@ -48,7 +48,7 @@ class RankingModel(tf.keras.Model):
         tf.keras.layers.Lambda(lambda x: tf.as_string(x)),
         tf.keras.layers.StringLookup(
             vocabulary=unique_user_ids, mask_token=None),
-        # Input of 943 dims -->  Embedding of 32 dims
+        # Create embedding layer of dimension 943x32
         tf.keras.layers.Embedding(
             len(unique_user_ids) + 1, embedding_dimension)
     ])

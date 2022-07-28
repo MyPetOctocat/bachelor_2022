@@ -198,6 +198,8 @@ def run_fn(fn_args: tfx.components.FnArgs):
   print(model.summary())
   print()
 
+  ### Post-Training Actions
+
   # Save plot of model architecture
   model_num = fn_args.serving_model_dir.split("/")[-2]   # extract model number
   img_dir = fn_args.custom_config["plot_path"] + f"/{model_num}"

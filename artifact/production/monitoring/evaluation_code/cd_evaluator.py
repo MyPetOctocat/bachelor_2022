@@ -1,5 +1,5 @@
 import pandas as pd
-from time import time
+from datetime import datetime
 from rmse_calculator import rmse_calc
 from cd_detector import cd_detector
 from rmse_plot_generator import plot_gen as rpg
@@ -25,12 +25,12 @@ rmse_df = pd.DataFrame(dict(rmse_float=rmse_float, rmse_int=rmse_int))
 no_cd = cd_detector(rmse_df, delta_threshold=0.1, absolute_threshold=1.5)
 
 # Write file of the CD evaluation result (prerequisite to CD adaptation: File can be read by Airflow an initiate TFX retraining)
-if no_cd:
+if no_cd[0]:
     with open('evaluation_outputs/OK.txt', 'w') as file:
-        file.write(str(time()))
+        file.write("run:\t\t" + str(datetime.now()) + "\nNO CD DETECTED")
 else:
     with open('evaluation_outputs/CD_DETECTED.txt', 'w') as file:
-        file.write(str(time()))
+        file.write("run:\t\t{}\ndelta:\t\t{}\nabsolute:\t{}".format(datetime.now(), no_cd[1][0], no_cd[1][1]))
 
 
 # CD understanding (give visual feedback about CD)
@@ -41,5 +41,4 @@ vis_rmse_int = rmse_calc(df[['date', 'user_rating', 'pred_int_rating']], group_b
 vis_rmse_df = pd.DataFrame(dict(rmse_float=vis_rmse_float, rmse_int=vis_rmse_int))
 
 rpg(vis_rmse_df, "evaluation_outputs/rmse_trend.png")
-
 

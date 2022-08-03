@@ -50,7 +50,7 @@ _beam_pipeline_args = [
 # Airflow-specific configs; these will be passed directly to airflow
 _airflow_config = {
     'schedule_interval': None,
-    'start_date': datetime.datetime(2019, 1, 1),
+    'start_date': datetime.datetime(2022, 8, 3),
 }
 
 
@@ -82,6 +82,7 @@ def _create_pipeline(pipeline_name: str, pipeline_root: str, data_root: str,
   trainer = tfx.components.Trainer(
       module_file=module_file,
       examples=example_gen.outputs['examples'],
+      schema=schema_gen.outputs['schema'],
       train_args=tfx.proto.TrainArgs(num_steps=12),
       eval_args=tfx.proto.EvalArgs(num_steps=24),
       custom_config={"plot_path": plot_path})

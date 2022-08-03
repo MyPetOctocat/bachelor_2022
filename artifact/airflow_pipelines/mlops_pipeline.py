@@ -11,7 +11,8 @@ with DAG("a_mlops_pipeline",  # Dag id
     catchup=False  # Catchup
 ) as dag:
 
-    cd_eval = ShortCircuitOperator(
+    # Externally trigger individual pipelines
+    cd_eval = ShortCircuitOperator(  # This operator determines whether the next DAG (retraining) will be executed
         task_id='cd_evaluation',
         python_callable=evaluate,
         dag=dag)

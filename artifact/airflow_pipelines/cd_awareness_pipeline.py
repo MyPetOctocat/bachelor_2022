@@ -4,6 +4,7 @@ from airflow.operators.python import PythonOperator
 import pandas as pd
 from datetime import datetime
 import os
+import glob
 
 # switch to production directory
 os.chdir("/home/cory/PycharmProjects/bachelor_2022/artifact/production/monitoring")
@@ -22,7 +23,14 @@ with DAG("cd_evaluation",  # Dag id
 ) as dag:
 
     def evaluate():
-        df = pd.read_csv('DCN-iterate_1658684509_predictions.csv')  # Load prediction score dataset
+
+        # load Dataframe with monitoring data of newest model
+        PIPELINE_NAME = 'DCN-iterate'
+        SERVING_MODEL_DIR = os.path.join('../../pipeline/serving_model', PIPELINE_NAME)
+
+        model_name = max(glob.glob(os.path.join(SERVING_MODEL_DIR, '*/')), key=os.path.getmtime).split("/")[-2]
+
+        df = pd.read_csv(f'{model_name}_monitoring.csv')  # Load prediction score dataset
 
         df['date'] = pd.to_datetime(df['timestamp'], unit='s')
 
@@ -38,10 +46,10 @@ with DAG("cd_evaluation",  # Dag id
 
         # Write file of the CD evaluation result (prerequisite to CD adaptation: File can be read by Airflow an initiate TFX retraining)
         if no_cd[0]:
-            with open('evaluation_outputs/OK.txt', 'w') as file:
+            with open(f'evaluation_outputs/{model_name}_OK.txt', 'w') as file:
                 file.write("run:\t\t" + str(datetime.now()) + "\nNO CD DETECTED")
         else:
-            with open('evaluation_outputs/CD_DETECTED.txt', 'w') as file:
+            with open(f'evaluation_outputs/{model_name}_CD_DETECTED.txt', 'w') as file:
                 file.write("run:\t\t{}\ndelta:\t\t{}\nabsolute:\t{}".format(datetime.now(), no_cd[1][0], no_cd[1][1]))
 
         # CD understanding (give visual feedback about CD)
@@ -52,7 +60,7 @@ with DAG("cd_evaluation",  # Dag id
                                  group_by)  # RMSE of rounded predictions
         vis_rmse_df = pd.DataFrame(dict(rmse_float=vis_rmse_float, rmse_int=vis_rmse_int))
 
-        rpg(vis_rmse_df, "evaluation_outputs/rmse_trend.png")
+        rpg(vis_rmse_df, f'evaluation_outputs/{model_name}_rmse_trend.png')
 
         return not no_cd[0]  # Is passed on to ShortCircuitOperator: If True (CD has been detected) trigger TFX training pipeline
 

@@ -21,7 +21,7 @@ df = pd.read_csv(prediction_data_dir)
 loaded_model = tf.saved_model.load(max(glob.glob(os.path.join(SERVING_MODEL_DIR, '*/')), key=os.path.getmtime))  # Load newest model from 'serving_model'
 model_name = max(glob.glob(os.path.join(SERVING_MODEL_DIR, '*/')), key=os.path.getmtime).split("/")[-2]  # Get model name to assign monitoring data to model
 
-MONITORING = f'production/monitoring/{PIPELINE_NAME}_{model_name}_predictions.csv'
+MONITORING = f'production/monitoring/{model_name}_monitoring.csv'
 
 # Add rating columns to be filled by predict_batch
 df['pred_rating'] = 0

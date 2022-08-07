@@ -87,42 +87,6 @@ def _create_pipeline(pipeline_name: str, pipeline_root: str, data_root: str,
       eval_args=tfx.proto.EvalArgs(num_steps=24),
       custom_config={"plot_path": plot_path})
 
-
-  # Evaluation of trained model against deployed models
-
-  model_resolver = tfx.dsl.Resolver(
-        strategy_class=tfx.dsl.experimental.LatestBlessedModelStrategy,
-        model=tfx.dsl.Channel(type=tfx.types.standard_artifacts.Model),
-        model_blessing=tfx.dsl.Channel(
-            type=tfx.types.standard_artifacts.ModelBlessing)).with_id(
-                'latest_blessed_model_resolver')
-
-  eval_config = tfma.EvalConfig(
-      model_specs=[tfma.ModelSpec(label_key="user_rating")],
-      slicing_specs=[tfma.SlicingSpec()],
-      metrics_specs = [
-          tfma.MetricsSpec(metrics=[
-              tfma.MetricConfig(class_name="ExampleCount"),
-              tfma.MetricConfig(class_name="MeanSquaredError"),
-              tfma.MetricConfig(class_name="BinaryAccuracy",
-                   threshold=tfma.MetricThreshold(
-                       value_threshold=tfma.GenericValueThreshold(
-                           lower_bound={"value":0.1}),
-                       change_threshold=tfma.GenericChangeThreshold(
-                           direction=tfma.MetricDirection.HIGHER_IS_BETTER,
-                           absolute={"value":0.001})
-                   ))
-
-          ])
-          ]
-      )
-
-  evaluator = tfx.components.Evaluator(
-      examples=example_gen.outputs['examples'],
-      model=trainer.outputs['model'],
-      baseline_model=model_resolver.outputs['model'],
-      eval_config=eval_config)
-
   # Pushes the model to a filesystem destination.
   pusher = tfx.components.Pusher(
       model=trainer.outputs['model'],
@@ -137,8 +101,6 @@ def _create_pipeline(pipeline_name: str, pipeline_root: str, data_root: str,
       schema_gen,
       example_validator,
       trainer,
-      # model_resolver,
-      # evaluator,
       pusher,
   ]
 

@@ -12,6 +12,6 @@ needed. The emergent field of MLOps sets out to introduce practices to make ML o
 DevOps and adapts them to the specific needs of ML. This research project serves as
 a study of the current state of the art (SotA) for MLOps. Using the Design Science Research methodology, an MLOps pipeline is designed and implemented with TensorFlow Extended and Apache Airflow. The result of this thesis is a proof of concept of a
 continuous training pipeline for a SotA recommendation system. This pipeline is designed to automatically relearn the recommender system upon detecting concept drift
-through degradation of model performance
+through degradation of model performance.
 
 

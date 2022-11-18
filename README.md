@@ -14,4 +14,4 @@ a study of the current state of the art (SotA) for MLOps. Using the Design Scien
 continuous training pipeline for a SotA recommendation system. This pipeline is designed to automatically relearn the recommender system upon detecting concept drift
 through degradation of model performance.
 
-
+**Keywords:** Pipeline, MLOps, Continuous Training, Concept Drift, Recommender System, Machine Learning
